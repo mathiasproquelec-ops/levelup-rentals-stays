@@ -14,16 +14,243 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      apartments: {
+        Row: {
+          address: string
+          amenities: string[] | null
+          bathrooms: number
+          bedrooms: number
+          city: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_available: boolean
+          is_furnished: boolean
+          price_per_month: number
+          surface_area: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          amenities?: string[] | null
+          bathrooms?: number
+          bedrooms?: number
+          city?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean
+          is_furnished?: boolean
+          price_per_month: number
+          surface_area?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          amenities?: string[] | null
+          bathrooms?: number
+          bedrooms?: number
+          city?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean
+          is_furnished?: boolean
+          price_per_month?: number
+          surface_area?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reservations: {
+        Row: {
+          apartment_id: string | null
+          created_at: string
+          end_date: string
+          id: string
+          notes: string | null
+          payment_method: string | null
+          payment_status: string
+          reservation_type: string
+          start_date: string
+          status: string
+          total_price: number
+          updated_at: string
+          user_id: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          apartment_id?: string | null
+          created_at?: string
+          end_date: string
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          reservation_type: string
+          start_date: string
+          status?: string
+          total_price: number
+          updated_at?: string
+          user_id: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          apartment_id?: string | null
+          created_at?: string
+          end_date?: string
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          reservation_type?: string
+          start_date?: string
+          status?: string
+          total_price?: number
+          updated_at?: string
+          user_id?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_apartment_id_fkey"
+            columns: ["apartment_id"]
+            isOneToOne: false
+            referencedRelation: "apartments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vehicles: {
+        Row: {
+          brand: string
+          category: string
+          created_at: string
+          description: string | null
+          fuel_type: string
+          id: string
+          image_url: string | null
+          is_available: boolean
+          model: string
+          price_per_day: number
+          seats: number
+          transmission: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          brand: string
+          category?: string
+          created_at?: string
+          description?: string | null
+          fuel_type?: string
+          id?: string
+          image_url?: string | null
+          is_available?: boolean
+          model: string
+          price_per_day: number
+          seats?: number
+          transmission?: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          brand?: string
+          category?: string
+          created_at?: string
+          description?: string | null
+          fuel_type?: string
+          id?: string
+          image_url?: string | null
+          is_available?: boolean
+          model?: string
+          price_per_day?: number
+          seats?: number
+          transmission?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +377,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
