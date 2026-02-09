@@ -1,18 +1,29 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '@/hooks/useAuth';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement login logic with Supabase
-    console.log('Login attempt:', { email, password });
+    setIsLoading(true);
+    
+    const { error } = await signIn(email, password);
+    
+    if (!error) {
+      navigate('/');
+    }
+    
+    setIsLoading(false);
   };
 
   return (
@@ -74,9 +85,18 @@ const Login = () => {
               </div>
             </div>
 
-            <Button type="submit" className="btn-accent w-full h-12 text-base">
-              Se connecter
-              <ArrowRight className="ml-2" size={18} />
+            <Button type="submit" className="btn-accent w-full h-12 text-base" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 animate-spin" size={18} />
+                  Connexion...
+                </>
+              ) : (
+                <>
+                  Se connecter
+                  <ArrowRight className="ml-2" size={18} />
+                </>
+              )}
             </Button>
           </form>
 

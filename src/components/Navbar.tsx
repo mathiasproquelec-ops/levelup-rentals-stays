@@ -1,10 +1,18 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, Car, Building2, Home } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X, Car, Building2, Home, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, signOut, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const navLinks = [
     { name: 'Accueil', href: '/' },
@@ -39,12 +47,27 @@ const Navbar = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" asChild>
-              <Link to="/login">Connexion</Link>
-            </Button>
-            <Button className="btn-accent" asChild>
-              <Link to="/register">Créer un compte</Link>
-            </Button>
+            {loading ? null : user ? (
+              <>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <User size={18} />
+                  <span className="text-sm">{user.email}</span>
+                </div>
+                <Button variant="ghost" onClick={handleSignOut}>
+                  <LogOut size={18} className="mr-2" />
+                  Déconnexion
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link to="/login">Connexion</Link>
+                </Button>
+                <Button className="btn-accent" asChild>
+                  <Link to="/register">Créer un compte</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -73,12 +96,27 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="pt-4 border-t border-border flex flex-col gap-2">
-              <Button variant="outline" asChild className="w-full">
-                <Link to="/login">Connexion</Link>
-              </Button>
-              <Button className="btn-accent w-full" asChild>
-                <Link to="/register">Créer un compte</Link>
-              </Button>
+              {user ? (
+                <>
+                  <div className="flex items-center gap-2 text-muted-foreground py-2">
+                    <User size={18} />
+                    <span className="text-sm">{user.email}</span>
+                  </div>
+                  <Button variant="outline" className="w-full" onClick={() => { handleSignOut(); setIsOpen(false); }}>
+                    <LogOut size={18} className="mr-2" />
+                    Déconnexion
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" asChild className="w-full">
+                    <Link to="/login">Connexion</Link>
+                  </Button>
+                  <Button className="btn-accent w-full" asChild>
+                    <Link to="/register">Créer un compte</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>

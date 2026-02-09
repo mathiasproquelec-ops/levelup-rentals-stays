@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Mail, Lock, User, Phone, ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Lock, User, Phone, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,15 +15,48 @@ const Register = () => {
     password: '',
     confirmPassword: '',
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const { signUp } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement registration logic with Supabase
-    console.log('Registration attempt:', formData);
+    
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Erreur",
+        description: "Les mots de passe ne correspondent pas.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast({
+        title: "Erreur",
+        description: "Le mot de passe doit contenir au moins 6 caractères.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    
+    const { error } = await signUp(formData.email, formData.password, {
+      full_name: formData.fullName,
+      phone: formData.phone,
+    });
+    
+    if (!error) {
+      navigate('/login');
+    }
+    
+    setIsLoading(false);
   };
 
   return (
@@ -146,9 +181,18 @@ const Register = () => {
               </div>
             </div>
 
-            <Button type="submit" className="btn-accent w-full h-12 text-base mt-6">
-              Créer mon compte
-              <ArrowRight className="ml-2" size={18} />
+            <Button type="submit" className="btn-accent w-full h-12 text-base mt-6" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 animate-spin" size={18} />
+                  Création...
+                </>
+              ) : (
+                <>
+                  Créer mon compte
+                  <ArrowRight className="ml-2" size={18} />
+                </>
+              )}
             </Button>
           </form>
 
